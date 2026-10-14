@@ -1,0 +1,107 @@
+[
+  {
+    "id": "doliprane_1000",
+    "name": "Doliprane 1000 mg",
+    "generic": "Paracetamol",
+    "aliases": ["doliprane", "doliprane 1000", "doliprane 1000mg", "dolipran", "paracetamol", "paracetamol 1000mg", "paracetamol 1000 mg", "efferalgan", "dafalgan"],
+    "dose": {
+      "en": ["Adults: 1 tablet (1000 mg) when needed.", "Wait at least 6 hours between doses.", "Maximum 3 tablets (3 g) in 24 hours.", "Swallow with a glass of water."],
+      "fr": ["Adultes : 1 comprimé (1000 mg) en cas de besoin.", "Attendre au moins 6 heures entre deux prises.", "Maximum 3 comprimés (3 g) par 24 heures.", "Avaler avec un verre d'eau."],
+      "ar": ["للبالغين: قرص واحد (1000 ملغ) عند الحاجة.", "انتظر 6 ساعات على الأقل بين كل جرعة وأخرى.", "الحد الأقصى 3 أقراص (3 غرام) خلال 24 ساعة.", "ابلع القرص مع كوب من الماء."]
+    },
+    "warnings": {
+      "en": ["Too much paracetamol can seriously damage the liver.", "Do not take other medicines that contain paracetamol.", "Avoid alcohol while taking it.", "See a doctor if fever lasts over 3 days or pain over 5 days."],
+      "fr": ["Un excès de paracétamol peut gravement abîmer le foie.", "Ne pas associer d'autres médicaments contenant du paracétamol.", "Évitez l'alcool pendant le traitement.", "Consultez un médecin si la fièvre dure plus de 3 jours ou la douleur plus de 5 jours."],
+      "ar": ["الإفراط في تناول الباراسيتامول قد يضر بالكبد بشدة.", "لا تتناول أدوية أخرى تحتوي على الباراسيتامول.", "تجنّب الكحول أثناء العلاج.", "راجع الطبيب إذا استمرت الحمى أكثر من 3 أيام أو الألم أكثر من 5 أيام."]
+    },
+    "interactions": {
+      "en": ["Other paracetamol products (Efferalgan, Dafalgan...): risk of overdose.", "Blood thinners such as warfarin: regular use can increase their effect.", "Alcohol and some epilepsy medicines increase the risk to the liver."],
+      "fr": ["Autres produits au paracétamol (Efferalgan, Dafalgan...) : risque de surdosage.", "Anticoagulants comme la warfarine : une prise régulière peut renforcer leur effet.", "L'alcool et certains antiépileptiques augmentent le risque pour le foie."],
+      "ar": ["منتجات الباراسيتامول الأخرى (إيفيرالغان، دافالغان...): خطر الجرعة الزائدة.", "مضادات التخثر مثل الوارفارين: الاستعمال المنتظم قد يزيد تأثيرها.", "الكحول وبعض أدوية الصرع تزيد الخطر على الكبد."]
+    }
+  },
+  {
+    "id": "ibuprofen_400",
+    "name": "Ibuprofen 400 mg",
+    "generic": "Ibuprofen",
+    "aliases": ["ibuprofen", "ibuprofene", "ibuprofen 400", "ibuprofen 400mg", "ibuprofene 400 mg", "brufen", "advil", "nurofen"],
+    "dose": {
+      "en": ["Adults: 1 tablet (400 mg) every 6 to 8 hours if needed.", "Maximum 3 tablets (1200 mg) per day without medical advice.", "Take with food or a glass of milk."],
+      "fr": ["Adultes : 1 comprimé (400 mg) toutes les 6 à 8 heures si besoin.", "Maximum 3 comprimés (1200 mg) par jour sans avis médical.", "Prendre pendant le repas ou avec un verre de lait."],
+      "ar": ["للبالغين: قرص واحد (400 ملغ) كل 6 إلى 8 ساعات عند الحاجة.", "الحد الأقصى 3 أقراص (1200 ملغ) يوميًا دون استشارة الطبيب.", "يُؤخذ مع الطعام أو مع كوب من الحليب."]
+    },
+    "warnings": {
+      "en": ["Can cause stomach pain, ulcers or bleeding.", "Do not use in the last 3 months of pregnancy.", "Be careful with kidney, heart or stomach problems, or asthma.", "Stop and see a doctor if you have black stools or severe stomach pain."],
+      "fr": ["Peut provoquer des douleurs d'estomac, des ulcères ou des saignements.", "Ne pas utiliser pendant les 3 derniers mois de grossesse.", "Prudence en cas de problèmes rénaux, cardiaques, d'estomac ou d'asthme.", "Arrêtez et consultez un médecin en cas de selles noires ou de fortes douleurs d'estomac."],
+      "ar": ["قد يسبب ألمًا في المعدة أو قرحة أو نزيفًا.", "لا يُستعمل خلال الأشهر الثلاثة الأخيرة من الحمل.", "احذر إذا كنت تعاني من مشاكل في الكلى أو القلب أو المعدة أو الربو.", "توقف عن الدواء وراجع الطبيب عند ظهور براز أسود أو ألم شديد في المعدة."]
+    },
+    "interactions": {
+      "en": ["Aspirin and other anti-inflammatory drugs: higher risk of bleeding.", "Blood thinners (warfarin) and corticosteroids: higher risk of stomach bleeding.", "Blood pressure pills and diuretics: may reduce their effect and harm the kidneys.", "Lithium and methotrexate: levels in the blood can rise."],
+      "fr": ["Aspirine et autres anti-inflammatoires : risque accru de saignement.", "Anticoagulants (warfarine) et corticoïdes : risque accru de saignement de l'estomac.", "Médicaments contre la tension et diurétiques : effet réduit et risque pour les reins.", "Lithium et méthotrexate : leur taux dans le sang peut augmenter."],
+      "ar": ["الأسبرين ومضادات الالتهاب الأخرى: خطر أكبر للنزيف.", "مضادات التخثر (وارفارين) والكورتيزون: خطر أكبر لنزيف المعدة.", "أدوية الضغط ومدرّات البول: قد يقل تأثيرها وقد تتضرر الكلى.", "الليثيوم والميثوتريكسات: قد يرتفع مستواهما في الدم."]
+    }
+  },
+  {
+    "id": "amoxicillin_500",
+    "name": "Amoxicillin 500 mg",
+    "generic": "Amoxicillin",
+    "aliases": ["amoxicillin", "amoxicilline", "amoxicillin 500", "amoxicillin 500mg", "amoxicilline 500 mg", "clamoxyl", "amoxil"],
+    "dose": {
+      "en": ["Prescription medicine: follow your doctor's instructions exactly.", "Usual adult dose: 500 mg three times a day.", "Finish the whole course, even if you feel better.", "Take at regular times, with or without food."],
+      "fr": ["Médicament sur ordonnance : suivez exactement les instructions du médecin.", "Dose habituelle de l'adulte : 500 mg trois fois par jour.", "Terminez tout le traitement, même si vous allez mieux.", "Prendre à heures régulières, pendant ou en dehors des repas."],
+      "ar": ["دواء بوصفة طبية: اتبع تعليمات الطبيب بدقة.", "الجرعة المعتادة للبالغين: 500 ملغ ثلاث مرات يوميًا.", "أكمل العلاج كله حتى لو شعرت بتحسن.", "تناوله في أوقات منتظمة، مع الطعام أو بدونه."]
+    },
+    "warnings": {
+      "en": ["Do not take if you are allergic to penicillin.", "Stop and get urgent help if you have swelling of the face or trouble breathing.", "Report diarrhea or a skin rash to your doctor."],
+      "fr": ["Ne pas prendre en cas d'allergie à la pénicilline.", "Arrêtez et demandez de l'aide en urgence si le visage gonfle ou si vous avez du mal à respirer.", "Signalez à votre médecin toute diarrhée ou éruption cutanée."],
+      "ar": ["لا تتناوله إذا كنت تعاني من حساسية تجاه البنسلين.", "توقف واطلب مساعدة عاجلة عند تورم الوجه أو صعوبة التنفس.", "أبلغ طبيبك عن أي إسهال أو طفح جلدي."]
+    },
+    "interactions": {
+      "en": ["Methotrexate: its toxicity can increase.", "Warfarin: bleeding risk can increase, ask for blood tests.", "Allopurinol: higher chance of skin rash."],
+      "fr": ["Méthotrexate : sa toxicité peut augmenter.", "Warfarine : le risque de saignement peut augmenter, des contrôles sanguins sont utiles.", "Allopurinol : risque plus élevé d'éruption cutanée."],
+      "ar": ["الميثوتريكسات: قد تزداد سميته.", "الوارفارين: قد يزداد خطر النزيف، اطلب فحوصات الدم.", "الألوبيورينول: احتمال أكبر لظهور الطفح الجلدي."]
+    }
+  },
+  {
+    "id": "aspirin_500",
+    "name": "Aspirin 500 mg",
+    "generic": "Acetylsalicylic acid",
+    "aliases": ["aspirin", "aspirine", "aspirin 500", "aspirin 500mg", "aspirine 500 mg", "aspegic"],
+    "dose": {
+      "en": ["Adults: 1 tablet (500 mg) every 4 to 6 hours if needed.", "Maximum 6 tablets (3 g) per day.", "Take with food and a full glass of water."],
+      "fr": ["Adultes : 1 comprimé (500 mg) toutes les 4 à 6 heures si besoin.", "Maximum 6 comprimés (3 g) par jour.", "Prendre pendant le repas avec un grand verre d'eau."],
+      "ar": ["للبالغين: قرص واحد (500 ملغ) كل 4 إلى 6 ساعات عند الحاجة.", "الحد الأقصى 6 أقراص (3 غرام) يوميًا.", "يُؤخذ مع الطعام وكوب كامل من الماء."]
+    },
+    "warnings": {
+      "en": ["Never give to children or teenagers under 16 (risk of Reye's syndrome).", "Can cause stomach ulcers and bleeding.", "Do not use during pregnancy unless your doctor says so.", "Tell your doctor before any surgery or dental work."],
+      "fr": ["Ne jamais donner aux enfants ou adolescents de moins de 16 ans (risque de syndrome de Reye).", "Peut provoquer des ulcères et des saignements de l'estomac.", "Ne pas utiliser pendant la grossesse sauf avis du médecin.", "Prévenez votre médecin avant toute opération ou soin dentaire."],
+      "ar": ["لا يُعطى أبدًا للأطفال والمراهقين دون 16 سنة (خطر متلازمة راي).", "قد يسبب قرحة ونزيفًا في المعدة.", "لا يُستعمل أثناء الحمل إلا بأمر الطبيب.", "أخبر طبيبك قبل أي عملية جراحية أو علاج للأسنان."]
+    },
+    "interactions": {
+      "en": ["Blood thinners (warfarin, clopidogrel): serious bleeding risk.", "Ibuprofen and other anti-inflammatories: more stomach damage.", "Methotrexate: its toxicity can increase.", "Corticosteroids: higher risk of stomach bleeding."],
+      "fr": ["Anticoagulants (warfarine, clopidogrel) : risque grave de saignement.", "Ibuprofène et autres anti-inflammatoires : plus de lésions de l'estomac.", "Méthotrexate : sa toxicité peut augmenter.", "Corticoïdes : risque accru de saignement de l'estomac."],
+      "ar": ["مضادات التخثر (وارفارين، كلوبيدوغريل): خطر نزيف خطير.", "الإيبوبروفين ومضادات الالتهاب الأخرى: مزيد من تلف المعدة.", "الميثوتريكسات: قد تزداد سميته.", "الكورتيزون: خطر أكبر لنزيف المعدة."]
+    }
+  },
+  {
+    "id": "metformin_850",
+    "name": "Metformin 850 mg",
+    "generic": "Metformin",
+    "aliases": ["metformin", "metformine", "metformin 850", "metformin 850mg", "metformine 850 mg", "glucophage"],
+    "dose": {
+      "en": ["Prescription medicine: follow your doctor's instructions exactly.", "Usual dose: 1 tablet (850 mg) 2 to 3 times a day.", "Take during or right after meals.", "Swallow whole with water."],
+      "fr": ["Médicament sur ordonnance : suivez exactement les instructions du médecin.", "Dose habituelle : 1 comprimé (850 mg) 2 à 3 fois par jour.", "Prendre pendant ou juste après les repas.", "Avaler entier avec de l'eau."],
+      "ar": ["دواء بوصفة طبية: اتبع تعليمات الطبيب بدقة.", "الجرعة المعتادة: قرص واحد (850 ملغ) مرتين إلى ثلاث مرات يوميًا.", "يُؤخذ أثناء الوجبات أو بعدها مباشرة.", "يُبلع كاملًا مع الماء."]
+    },
+    "warnings": {
+      "en": ["Rare but serious: lactic acidosis. Seek help for strong tiredness, vomiting or fast breathing.", "Tell your doctor if you have kidney or liver problems.", "Avoid heavy alcohol drinking.", "Stop before scans with contrast dye, as your doctor instructs."],
+      "fr": ["Rare mais grave : acidose lactique. Demandez de l'aide en cas de grande fatigue, de vomissements ou de respiration rapide.", "Prévenez votre médecin en cas de problèmes de reins ou de foie.", "Évitez de boire beaucoup d'alcool.", "À arrêter avant un examen avec produit de contraste, selon les instructions du médecin."],
+      "ar": ["نادر لكنه خطير: الحماض اللبني. اطلب المساعدة عند التعب الشديد أو القيء أو سرعة التنفس.", "أخبر طبيبك إذا كنت تعاني من مشاكل في الكلى أو الكبد.", "تجنّب الإفراط في شرب الكحول.", "يُوقف قبل الفحوصات بالصبغة حسب تعليمات الطبيب."]
+    },
+    "interactions": {
+      "en": ["Contrast dye used in X-ray scans: can harm the kidneys.", "Alcohol: raises the risk of lactic acidosis.", "Corticosteroids and diuretics: may raise blood sugar."],
+      "fr": ["Produits de contraste pour examens radiologiques : risque pour les reins.", "Alcool : augmente le risque d'acidose lactique.", "Corticoïdes et diurétiques : peuvent faire monter la glycémie."],
+      "ar": ["صبغة التباين المستخدمة في الأشعة: قد تضر بالكلى.", "الكحول: يزيد خطر الحماض اللبني.", "الكورتيزون ومدرّات البول: قد ترفع سكر الدم."]
+    }
+  }
+]
