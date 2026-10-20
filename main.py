@@ -19,6 +19,7 @@ from scanner import config, hud
 from scanner.config import LABELS
 from scanner.database import MedicineDB, pick_section
 from scanner.hands import HandTracker, NullTracker
+
 from scanner.pipeline import Scanner
 from scanner.speaker import Speaker
 
