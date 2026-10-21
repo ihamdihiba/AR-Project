@@ -281,7 +281,7 @@ class App:
 
                 self.last_crop = frame[RY:RY + RH, RX:RX + RW].copy()
 
-                # Ignore hand inside medicine box when in SCAN state
+              
                 ignore_box = (RX, RY, RW, RH) if self.state == "SCAN" else None
                 finger = self.hands.update(frame, ignore_box=ignore_box)
 

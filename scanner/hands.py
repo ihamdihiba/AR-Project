@@ -44,10 +44,10 @@ class HandTracker:
                 tip = pts[8]   # Index fingertip
                 wrist = pts[0] # Wrist
 
-                # Check if this hand is inside the medicine scan box
+
                 if ignore_box is not None:
                     bx, by, bw, bh = ignore_box
-                    # If wrist or fingertip is inside the box, this hand is holding the medicine
+                    
                     in_box = (bx <= tip[0] <= bx + bw and by <= tip[1] <= by + bh) or \
                              (bx <= wrist[0] <= bx + bw and by <= wrist[1] <= by + bh)
                     if in_box:
@@ -55,13 +55,13 @@ class HandTracker:
 
                 valid_fingertips.append(tip)
 
-            # If all hands were inside the box, fall back to the rightmost hand
+           
             if not valid_fingertips:
                 all_tips = [int(hand_lms[8].x * w) for hand_lms in res.hand_landmarks]
                 best_idx = int(np.argmax(all_tips)) if len(all_tips) > 1 else 0
                 raw = (int(res.hand_landmarks[best_idx][8].x * w), int(res.hand_landmarks[best_idx][8].y * h))
             else:
-                # Pick the hand closest to interactive UI (right side of screen)
+               
                 valid_fingertips.sort(key=lambda p: p[0], reverse=True)
                 raw = valid_fingertips[0]
 
