@@ -15,3 +15,5 @@ Thumbs.db
 
 # Optional local font override
 assets/*.ttf
+
+hand_landmarker.task
