@@ -2,10 +2,12 @@
 Clean TrueType single-pass text rendering with frosted glass panels and hand cursor.
 """
 from __future__ import annotations
+
 import math
 import time
 from dataclasses import dataclass
 from pathlib import Path
+
 import cv2
 import numpy as np
 from PIL import Image, ImageDraw, ImageFont
@@ -16,17 +18,21 @@ from .database import pick_section
 # --- Colors & Look & Layout ---
 WHITE = (255, 255, 255)
 ACCENT = (255, 122, 10)  # iOS blue (BGR)
-INK = 24                 # Dark tint
+INK = 24  # Dark tint
 FROSTED_GLASS = (240, 240, 245)
 PASTEL_LILAC = (235, 200, 215)
 PASTEL_MINT = (195, 245, 185)
 
-CARD = (290, 78, 700, 564)   # x, y, w, h
+CARD = (290, 78, 700, 564)  # x, y, w, h
 SEG_W, SEG_H = 560, 44
 TABS = ["info", "dose", "warnings"]
 
 WHEEL_CX, WHEEL_CY, WHEEL_STEP = 640, 402, 84
 WHEEL_ROW_W, WHEEL_ROW_H = 380, 72
+
+# Left-side wheel for Symptoms
+SYM_WHEEL_CX, SYM_WHEEL_CY, SYM_WHEEL_STEP = 330, 390, 84
+SYM_WHEEL_ROW_W, SYM_WHEEL_ROW_H = 460, 76
 
 UI = {
     "overview": {"en": "Overview", "fr": "Aperçu", "ar": "نظرة عامة"},
@@ -35,9 +41,11 @@ UI = {
     "listen": {"en": "Listen", "fr": "Écouter", "ar": "استماع"},
 }
 
+
 def t(key: str, lang: str) -> str:
     table = UI.get(key) or getattr(config, "LABELS", {}).get(key) or {}
     return table.get(lang) or table.get("en", "")
+
 
 def tab_label(tab: str, lang: str) -> str:
     if tab == "info":
@@ -48,9 +56,11 @@ def tab_label(tab: str, lang: str) -> str:
     labels = getattr(config, "LABELS", {}).get("warnings", {})
     return labels.get(lang, "Warnings")
 
+
 def seg_rect():
     x, y, w, h = CARD
     return (x + (w - SEG_W) // 2, y + 22, SEG_W, SEG_H)
+
 
 # --- Font Resolution ---
 DIRS = [
@@ -76,6 +86,7 @@ ARABIC = {
 
 _FONTS: dict = {}
 
+
 def _find(names):
     for name in names:
         for d in DIRS:
@@ -83,6 +94,7 @@ def _find(names):
             if p.exists():
                 return str(p)
     return None
+
 
 def get_font(size: int, weight: str = "regular", arabic: bool = False):
     size = max(8, int(round(size)))
@@ -102,24 +114,29 @@ def get_font(size: int, weight: str = "regular", arabic: bool = False):
     _FONTS[key] = f
     return f
 
+
 def text_w(s: str, size: int, weight: str = "regular") -> float:
     if not s:
         return 0.0
     return get_font(size, weight, textkit.has_arabic(s)).getlength(textkit.shape(s))
 
-def _fit(s: str, size: int, max_w: int, weight: str = "regular", min_size: int = 16) -> int:
+
+def fit(s: str, size: int, max_w: int, weight: str = "regular", min_size: int = 16) -> int:
     while size > min_size and text_w(s, size, weight) > max_w:
         size -= 1
     return size
 
+
 # --- Glass Rendering Cache & Helpers ---
 _CACHE: dict = {}
+
 
 def _remember(key, value):
     if len(_CACHE) > 120:
         _CACHE.clear()
     _CACHE[key] = value
     return value
+
 
 def _shape(w: int, h: int, r: int) -> dict:
     key = ("shape", w, h, r)
@@ -146,6 +163,7 @@ def _shape(w: int, h: int, r: int) -> dict:
     }
     return _remember(key, s)
 
+
 def _paint(roi, s, src):
     np.copyto(roi, src, where=s["inner"])
     by, bx, c = s["band"]
@@ -154,16 +172,19 @@ def _paint(roi, s, src):
         n = src[by, bx].astype(np.float32)
         roi[by, bx] = (o * (1 - c) + n * c).astype(np.uint8)
 
+
 def _edge(roi, s, strength):
     ry, rx, a = s["ring"]
     o = roi[ry, rx].astype(np.float32)
     roi[ry, rx] = (o + (255 - o) * (a * strength)).astype(np.uint8)
+
 
 def _blur(roi):
     h, w = roi.shape[:2]
     small = cv2.resize(np.ascontiguousarray(roi), (max(2, w // 5), max(2, h // 5)), interpolation=cv2.INTER_AREA)
     small = cv2.GaussianBlur(small, (0, 0), 4.0)
     return cv2.resize(small, (w, h), interpolation=cv2.INTER_LINEAR)
+
 
 def _shadow(frame, x, y, w, h, r):
     pad, dy = 40, 14
@@ -185,6 +206,7 @@ def _shadow(frame, x, y, w, h, r):
     mm = np.ascontiguousarray(m[cy0 - y0:cy1 - y0, cx0 - x0:cx1 - x0])
     frame[cy0:cy1, cx0:cx1] = cv2.multiply(roi, mm, scale=1 / 255.0)
 
+
 def glass(frame, x, y, w, h, r=None, tint=0.46, light=0.07, border=1.0, blur=True, shadow=False):
     x, y, w, h = int(x), int(y), int(w), int(h)
     H, W = frame.shape[:2]
@@ -202,6 +224,7 @@ def glass(frame, x, y, w, h, r=None, tint=0.46, light=0.07, border=1.0, blur=Tru
     _paint(roi, s, src)
     if border >= 0:
         _edge(roi, s, border * 0.55)
+
 
 def solid(frame, x, y, w, h, color, r=None, hi=0.2, shadow=True):
     x, y, w, h = int(x), int(y), int(w), int(h)
@@ -222,6 +245,7 @@ def solid(frame, x, y, w, h, color, r=None, hi=0.2, shadow=True):
     _paint(roi, s, src)
     _edge(roi, s, 0.35)
 
+
 def _sweep_fill(frame, x, y, w, h, r, progress):
     fw = int(w * progress)
     if fw < 2:
@@ -230,12 +254,14 @@ def _sweep_fill(frame, x, y, w, h, r, progress):
     roi = frame[y:y + h, x:x + fw]
     roi[:] = (roi + (255 - roi) * (0.30 * cov)).astype(np.uint8)
 
+
 def _white(frame, x, y, m):
     h, w = m.shape
     roi = np.ascontiguousarray(frame[y:y + h, x:x + w])
     m3 = cv2.cvtColor(m, cv2.COLOR_GRAY2BGR)
     add = cv2.multiply(cv2.bitwise_not(roi), m3, scale=1 / 255.0)
     frame[y:y + h, x:x + w] = cv2.add(roi, add)
+
 
 # --- Clean Single-Pass Text & Layer System ---
 class Layer:
@@ -293,12 +319,13 @@ class Layer:
         self.circle(p1, w / 2, -1, a)
         self.circle(p2, w / 2, -1, a)
 
+
 class Canvas:
     def __init__(self, frame):
         self.frame = frame
         self.H, self.W = frame.shape[:2]
         self.main = Layer(0, 0, self.W, self.H)
-        self._windows = []
+        self.windows = []
 
     def text(self, s, x, y, size=20, color=None, anchor="l", bold=False, weight=None, alpha=1.0, glow=0.0):
         self.main.text(s, x, y, size, weight or ("semibold" if bold else "regular"), alpha, anchor, glow)
@@ -306,7 +333,7 @@ class Canvas:
     def window(self, x, y, w, h, fade_top=0, fade_bottom=0):
         L = Layer(int(x), int(y), int(w), int(h))
         L.fade = (fade_top, fade_bottom)
-        self._windows.append(L)
+        self.windows.append(L)
         return L
 
     def flush(self):
@@ -323,7 +350,7 @@ class Canvas:
                 arr = cv2.convertScaleAbs(arr, alpha=2.4)
                 _white(fr, x0, y0, arr)
         _white(fr, 0, 0, np.maximum(np.asarray(self.main.img), self.main.shp))
-        for L in self._windows:
+        for L in self.windows:
             a = np.maximum(np.asarray(L.img), L.shp)
             ft, fb = L.fade
             if ft or fb:
@@ -335,7 +362,7 @@ class Canvas:
                 a = (a * ramp[:, None]).astype(np.uint8)
             _white(fr, L.x, L.y, a)
 
-# --- Button Dataclass (Compatible with all arguments) ---
+
 @dataclass
 class Button:
     id: str
@@ -352,6 +379,7 @@ class Button:
 
     def contains(self, p) -> bool:
         return p is not None and self.x <= p[0] <= self.x + self.w and self.y <= p[1] <= self.y + self.h
+
 
 class DwellSelector:
     def __init__(self, seconds: float = 0.9):
@@ -377,7 +405,9 @@ class DwellSelector:
             return hit, 0.0, hit
         return hit, progress, None
 
-ICON_W = {"shutter": 24, "spinner": 24, "play": 18, "pause": 18, "back": 12, "": 0}
+
+ICON_W = {"shutter": 24, "spinner": 24, "play": 18, "pause": 18, "back": 12, "check": 18, "plus": 18, "": 0}
+
 
 def _icon(L: Layer, name: str, cx: float, cy: float):
     if name == "shutter":
@@ -394,6 +424,10 @@ def _icon(L: Layer, name: str, cx: float, cy: float):
     elif name == "back":
         L.cap_line((cx + 3, cy - 8), (cx - 4, cy), w=3)
         L.cap_line((cx - 4, cy), (cx + 3, cy + 8), w=3)
+    elif name == "check":
+        L.cap_line((cx - 7, cy), (cx - 2, cy + 6), w=3)
+        L.cap_line((cx - 2, cy + 6), (cx + 7, cy - 6), w=3)
+
 
 def draw_button(cv: Canvas, b: Button, hover=False, progress=0.0, label=None, icon=None):
     if b.kind in ("hit", "tab"):
@@ -404,10 +438,14 @@ def draw_button(cv: Canvas, b: Button, hover=False, progress=0.0, label=None, ic
     r = b.h // 2
     if b.kind == "primary":
         solid(fr, b.x, b.y, b.w, b.h, ACCENT, hi=0.34 if hover else 0.22)
+    elif b.kind == "chip":
+        glass(fr, b.x, b.y, b.w, b.h, r=r, tint=0.6, light=0.18 if hover else 0.08, shadow=True)
     else:
         glass(fr, b.x, b.y, b.w, b.h, r=r, tint=0.46, light=0.16 if hover else 0.07, shadow=True)
+
     if progress > 0:
         _sweep_fill(fr, b.x, b.y, b.w, b.h, min(r, b.h // 2, b.w // 2), progress)
+
     size = 19 if b.size == 20 else b.size
     tw = text_w(label, size, "semibold")
     iw = ICON_W.get(icon, 0)
@@ -418,7 +456,8 @@ def draw_button(cv: Canvas, b: Button, hover=False, progress=0.0, label=None, ic
         _icon(cv.main, icon, gx + iw / 2, cy)
     cv.main.text(label, gx + iw + gap, cy, size, "semibold", 1.0, "l")
 
-def draw_cursor(frame, finger, progress):
+
+def draw_cursor(frame, finger, progress, pinching=False):
     if not finger:
         return
     x, y = int(finger[0]), int(finger[1])
@@ -433,25 +472,28 @@ def draw_cursor(frame, finger, progress):
     cv2.circle(over, c, 20, (0, 0, 0), 5, cv2.LINE_AA)
     cv2.addWeighted(over, 0.16, roi, 0.84, 0, roi)
     over = roi.copy()
-    cv2.circle(over, c, 19, WHITE, 2, cv2.LINE_AA)
-    cv2.circle(over, c, 7, WHITE, -1, cv2.LINE_AA)
+    cur_color = (0, 230, 255) if pinching else WHITE
+    cv2.circle(over, c, 19, cur_color, 2, cv2.LINE_AA)
+    cv2.circle(over, c, 7, cur_color, -1, cv2.LINE_AA)
     cv2.addWeighted(over, 0.92, roi, 0.08, 0, roi)
     if progress > 0:
         cv2.ellipse(roi, c, (19, 19), -90, 0, int(360 * progress), ACCENT, 4, cv2.LINE_AA)
 
+
 # --- Screen Phases ---
 def draw_island(cv: Canvas, title="Touchless Medicine AR"):
-    w, h = 330, 40
+    w, h = 360, 40
     glass(cv.frame, (cv.W - w) // 2, 16, w, h, r=20, tint=0.72, light=0.0, border=0.6)
     cv.text(title, cv.W // 2, 36, size=17, weight="semibold", anchor="c")
+
 
 def draw_toast(cv: Canvas, text: str):
     if not text:
         return
     size, max_w = 16, 440
-    f_words = text.split()
+    fwords = text.split()
     lines, cur = [], ""
-    for wd in f_words:
+    for wd in fwords:
         trial = (cur + " " + wd).strip()
         if cur and text_w(trial, size) > max_w:
             lines.append(cur)
@@ -468,6 +510,7 @@ def draw_toast(cv: Canvas, text: str):
     for i, l in enumerate(lines):
         cv.text(l, x + w // 2, y + 24 + i * 24, size=size, anchor="c")
 
+
 def _dim_outside(fr, rect, r, strength):
     x, y, w, h = rect
     H, W = fr.shape[:2]
@@ -479,6 +522,7 @@ def _dim_outside(fr, rect, r, strength):
     dark[y:y + h, x:x + w] = (roi * cov + dark[y:y + h, x:x + w] * (1 - cov)).astype(np.uint8)
     fr[:] = dark
 
+
 def _sweep_line(fr, rect, r, yy):
     x, y, w, h = rect
     y0, y1 = max(yy - 56, y), min(yy + 56, y + h)
@@ -489,6 +533,7 @@ def _sweep_line(fr, rect, r, yy):
     cov = _shape(w, h, r)["cov"][y0 - y:y1 - y, :, None]
     roi = fr[y0:y1, x:x + w]
     roi[:] = (roi + (255 - roi) * prof * cov).astype(np.uint8)
+
 
 def draw_scan_phase(cv: Canvas, rect, scanning=False, t_now=None):
     x, y, w, h = rect
@@ -503,25 +548,26 @@ def draw_scan_phase(cv: Canvas, rect, scanning=False, t_now=None):
     L.line((x + R, y + h), (x + w - R, y + h), 1, 0.28)
     L.line((x, y + R), (x, y + h - R), 1, 0.28)
     L.line((x + w, y + R), (x + w, y + h - R), 1, 0.28)
-
     L.arc((x + R, y + R), R, 180, 270, w=th)
     L.arc((x + w - R, y + R), R, 270, 360, w=th)
     L.arc((x + w - R, y + h - R), R, 0, 90, w=th)
     L.arc((x + R, y + h - R), R, 90, 180, w=th)
     for p1, p2 in (
-        ((x + R, y), (x + R + arm, y)), ((x, y + R), (x, y + R + arm)),
-        ((x + w - R, y), (x + w - R - arm, y)), ((x + w, y + R), (x + w, y + R + arm)),
-        ((x + w - R, y + h), (x + w - R - arm, y + h)), ((x + w, y + h - R), (x + w, y + h - R - arm)),
-        ((x + R, y + h), (x + R + arm, y + h)), ((x, y + h - R), (x, y + h - R - arm)),
+        ((x + R, y), (x + R + arm, y)),
+        ((x, y + R), (x, y + R + arm)),
+        ((x + w - R, y), (x + w - R - arm, y)),
+        ((x + w, y + R), (x + w, y + R + arm)),
+        ((x + w - R, y + h), (x + w - R - arm, y + h)),
+        ((x + w, y + h - R), (x + w, y + h - R - arm)),
+        ((x + R, y + h), (x + R + arm, y + h)),
+        ((x, y + h - R), (x, y + h - R - arm)),
     ):
         L.cap_line(p1, p2, w=th)
-
     if scanning:
         tt = time.time() if t_now is None else t_now
         ph = (tt * 0.9) % 2.0
         pos = ph if ph <= 1 else 2 - ph
         _sweep_line(fr, rect, R, int(y + 24 + pos * (h - 48)))
-
     cx = x + w // 2
     pw, ph = 440, 70
     px, py = cx - pw // 2, y + h + 18
@@ -530,19 +576,28 @@ def draw_scan_phase(cv: Canvas, rect, scanning=False, t_now=None):
     cv.text(title, cx, py + 27, size=21, weight="semibold", anchor="c", glow=0.35)
     cv.text("Box, blister pack or pills with visible writing", cx, py + 51, size=14, alpha=0.65, anchor="c")
 
+
 def draw_language_select_phase(cv: Canvas, med_name: str, wheel_pos: float, order, hover=None):
     fr = cv.frame
     cx = WHEEL_CX
     pw, ph = 480, 452
     px, py = cx - pw // 2, WHEEL_CY - 250
     glass(fr, px, py, pw, ph, r=46, tint=0.5, light=0.05, shadow=True)
-    cv.text("Recognized", cx, py + 38, size=14, weight="semibold", alpha=0.55, anchor="c")
-    size = _fit(med_name, 32, pw - 90, "semibold")
+    cv.text("Select Language", cx, py + 38, size=14, weight="semibold", alpha=0.55, anchor="c")
+    size = fit(med_name, 32, pw - 90, "semibold")
     cv.text(med_name, cx, py + 78, size=size, weight="semibold", anchor="c", glow=0.4)
-
-    glass(fr, cx - WHEEL_ROW_W // 2, WHEEL_CY - WHEEL_ROW_H // 2, WHEEL_ROW_W, WHEEL_ROW_H,
-          r=26, tint=0.0, light=0.24 if hover == "wheel_pick" else 0.16, border=0.5, blur=False)
-
+    glass(
+        fr,
+        cx - WHEEL_ROW_W // 2,
+        WHEEL_CY - WHEEL_ROW_H // 2,
+        WHEEL_ROW_W,
+        WHEEL_ROW_H,
+        r=26,
+        tint=0.0,
+        light=0.24 if hover == "wheel_pick" else 0.16,
+        border=0.5,
+        blur=False,
+    )
     names = dict(getattr(config, "LANGS", [("ar", "العربية"), ("en", "English"), ("fr", "Français")]))
     for i, code in enumerate(order):
         d = i - wheel_pos
@@ -551,11 +606,113 @@ def draw_language_select_phase(cv: Canvas, med_name: str, wheel_pos: float, orde
             continue
         k = min(ad, 1.0)
         alpha = 1.0 - 0.66 * k if ad <= 1 else 0.34 * (2 - ad)
-        cv.text(names.get(code, code), cx, WHEEL_CY + d * WHEEL_STEP,
-                size=int(round(44 - 14 * k)), weight="semibold" if ad < 0.5 else "regular",
-                alpha=alpha, anchor="c", glow=0.5 * (1 - k))
-
+        cv.text(
+            names.get(code, code),
+            cx,
+            WHEEL_CY + d * WHEEL_STEP,
+            size=int(round(44 - 14 * k)),
+            weight="semibold" if ad < 0.5 else "regular",
+            alpha=alpha,
+            anchor="c",
+            glow=0.5 * (1 - k),
+        )
     cv.text("Swipe up or down, then hold on a language", cx, py + ph - 36, size=14, alpha=0.55, anchor="c")
+
+
+# --- Cylindrical Wheel Symptom Selector (Matches Language Wheel Look) ---
+def draw_symptom_wheel_phase(cv: Canvas, lang: str, symptoms: list, wheel_pos: float, selected: list, dragging_item: dict | None, finger: tuple | None, hover=None):
+    fr = cv.frame
+
+    # 1. Left Big Card: The Cylindrical Symptom Wheel
+    cx = SYM_WHEEL_CX
+    pw, ph = 520, 520
+    px, py = cx - pw // 2, SYM_WHEEL_CY - 250
+    glass(fr, px, py, pw, ph, r=46, tint=0.5, light=0.05, shadow=True)
+    header = {"en": "Symptom Picker", "fr": "Choix des Symptômes", "ar": "اختيار الأعراض"}.get(lang, "Symptoms")
+    cv.text(header, cx, py + 38, size=15, weight="semibold", alpha=0.55, anchor="c")
+    cv.text("Swipe or tap to scroll • Pinch center to drag", cx, py + 68, size=13, alpha=0.55, anchor="c")
+
+    # Center Active Glass Reticle (Focus Capsule)
+    glass(
+        fr,
+        cx - SYM_WHEEL_ROW_W // 2,
+        SYM_WHEEL_CY - SYM_WHEEL_ROW_H // 2,
+        SYM_WHEEL_ROW_W,
+        SYM_WHEEL_ROW_H,
+        r=26,
+        tint=0.0,
+        light=0.24 if hover == "sym_pick" else 0.16,
+        border=0.8,
+        blur=False,
+    )
+
+    # Render Cylindrical items with smooth alpha & size decay
+    for i, sym in enumerate(symptoms):
+        d = i - wheel_pos
+        ad = abs(d)
+        if ad >= 2.3:
+            continue
+        k = min(ad, 1.0)
+        alpha = 1.0 - 0.66 * k if ad <= 1 else max(0.12, 0.34 * (2.2 - ad))
+        name = sym.get(lang, sym["en"])
+        
+        # If currently being dragged from the center, show as ghost
+        if dragging_item and dragging_item["id"] == sym["id"] and ad < 0.6:
+            alpha *= 0.35
+
+        cv.text(
+            name,
+            cx,
+            SYM_WHEEL_CY + d * SYM_WHEEL_STEP,
+            size=int(round(34 - 10 * k)),
+            weight="semibold" if ad < 0.5 else "regular",
+            alpha=alpha,
+            anchor="c",
+            glow=0.5 * (1 - k),
+        )
+
+    # 2. Right Card: Selection Basket (Max 3)
+    rx, ry, rw, rh = 620, py, 580, ph
+    glass(fr, rx, ry, rw, rh, r=46, tint=0.5, light=0.05, shadow=True)
+    header_right = {"en": f"Selected Basket ({len(selected)}/3)", "fr": f"Panier Sélectionné ({len(selected)}/3)", "ar": f"سلة الأعراض ({len(selected)}/3)"}.get(lang, "Basket")
+    cv.text(header_right, rx + 40, ry + 38, size=18, weight="semibold", anchor="l", glow=0.3)
+    cv.text("Drag & drop symptoms here with pinch", rx + 40, ry + 68, size=13, alpha=0.55, anchor="l")
+
+    for i in range(3):
+        by = ry + 104 + i * 115
+        bw, bh = rw - 80, 92
+        bx = rx + 40
+        glass(fr, bx, by, bw, bh, r=24, tint=0.34, border=0.5, blur=False)
+        if i < len(selected):
+            item = selected[i]
+            solid(fr, bx + 6, by + 6, bw - 12, bh - 12, ACCENT, hi=0.18, shadow=False)
+            cv.text(item.get(lang, item["en"]), bx + 30, by + bh // 2, size=20, weight="semibold", anchor="l")
+        else:
+            empty_txt = {"en": "— Empty Slot —", "fr": "— Emplacement vide —", "ar": "— مكان فارغ —"}.get(lang, "Empty")
+            cv.text(empty_txt, bx + bw // 2, by + bh // 2, size=17, alpha=0.35, anchor="c")
+
+    # Dragged Ghost Floating under finger
+    if dragging_item and finger:
+        fx, fy = finger
+        dw, dh = 260, 68
+        dx, dy = fx - dw // 2, fy - dh // 2
+        glass(fr, dx, dy, dw, dh, r=20, tint=0.75, light=0.3, border=1.5, shadow=True)
+        cv.text(dragging_item.get(lang, dragging_item["en"]), fx, fy, size=18, weight="semibold", anchor="c", glow=0.5)
+
+
+def draw_recommendations_phase(cv: Canvas, lang: str, meds: list):
+    fr = cv.frame
+    cx, cy, cw, ch = 200, 80, 880, 560
+    glass(fr, cx, cy, cw, ch, r=46, tint=0.52, shadow=True)
+    title = {"en": "Recommended Medicines", "fr": "Médicaments Recommandés", "ar": "الأدوية المقترحة"}.get(lang, "Recommendations")
+    cv.text(title, cx + cw // 2, cy + 44, size=24, weight="semibold", anchor="c", glow=0.4)
+    hint = {"en": "Hover over a medicine card to see complete medical info", "fr": "Pointez une carte pour voir les informations complètes", "ar": "وجه إصبعك نحو أي دواء لعرض تفاصيله"}.get(lang, "Hover to inspect")
+    cv.text(hint, cx + cw // 2, cy + 74, size=14, alpha=0.6, anchor="c")
+
+    if not meds:
+        no_med = {"en": "No matching medicines found for selected symptoms.", "fr": "Aucun médicament trouvé pour ces symptômes.", "ar": "لم يتم العثور على أدوية مطابقة لهذه الأعراض."}.get(lang, "None")
+        cv.text(no_med, cx + cw // 2, cy + 240, size=18, alpha=0.7, anchor="c")
+
 
 # --- Tab Content & Layout ---
 def _items(med, section, lang):
@@ -564,6 +721,7 @@ def _items(med, section, lang):
         return [i for i in items if isinstance(i, str)], used
     except Exception:
         return [], lang
+
 
 def _blocks(med, lang, tab):
     out = []
@@ -592,6 +750,7 @@ def _blocks(med, lang, tab):
             out += [("item", i, il) for i in inter]
     return out
 
+
 def _wrap(text, size, weight, max_w):
     f = get_font(size, weight, textkit.has_arabic(text))
     lines, cur = [], ""
@@ -606,10 +765,12 @@ def _wrap(text, size, weight, max_w):
         lines.append(cur)
     return lines or [""]
 
+
 class Layout:
     def __init__(self, ops, height):
         self.ops = ops
         self.height = height
+
 
 def _layout(med, lang, tab, width) -> Layout:
     key = ("layout", id(med), lang, tab, width)
@@ -638,16 +799,17 @@ def _layout(med, lang, tab, width) -> Layout:
             y += 12
             wrapped = _wrap(text, 22, "regular", width - 36)
             for l_idx, ln in enumerate(wrapped):
-                bullet = ("• " if l_idx == 0 else "   ") if not rtl else ("• " if l_idx == 0 else "")
+                bullet = ("• " if l_idx == 0 else "  ") if not rtl else ("• " if l_idx == 0 else "")
                 full_line = bullet + ln
                 ops.append(("t", full_line, rtl, y + 16, 22, "regular", 0.96))
                 y += 32
             y += 12
-            if idx + 1 < len(blocks) and blocks[idx + 1][0] == "item":
-                ops.append(("sep", y))
+        if idx + 1 < len(blocks) and blocks[idx + 1][0] == "item":
+            ops.append(("sep", y))
     lay = Layout(ops, y)
     _remember(key, (med, lay))
     return lay
+
 
 def _draw_ops(win: Layer, lay: Layout, ox, oy, ww, alpha, vis_top, vis_h):
     for op in lay.ops:
@@ -665,26 +827,40 @@ def _draw_ops(win: Layer, lay: Layout, ox, oy, ww, alpha, vis_top, vis_h):
         else:
             win.text(txt, ox + 4, yy, size, wt, al * alpha, "l")
 
+
 def draw_info_phase(cv: Canvas, med, lang, page_pos, tab_idx, scroll):
     fr = cv.frame
     x, y, w, h = CARD
     glass(fr, x, y, w, h, r=50, tint=0.5, light=0.05, shadow=True)
-
     sx, sy, sw, sh = seg_rect()
     glass(fr, sx, sy, sw, sh, r=sh // 2, tint=0.30, light=0.0, border=0.4, blur=False)
     segw = (sw - 8) / 3
-    glass(fr, int(sx + 4 + page_pos * segw), sy + 4, int(segw), sh - 8,
-          r=(sh - 8) // 2, tint=0.0, light=0.26, border=0.8, blur=False)
-
+    glass(
+        fr,
+        int(sx + 4 + page_pos * segw),
+        sy + 4,
+        int(segw),
+        sh - 8,
+        r=(sh - 8) // 2,
+        tint=0.0,
+        light=0.26,
+        border=0.8,
+        blur=False,
+    )
     for i, tab in enumerate(TABS):
         near = 1 - min(1.0, abs(i - page_pos))
-        cv.text(tab_label(tab, lang), sx + 4 + segw * (i + 0.5), sy + sh // 2,
-                size=17, weight="semibold", alpha=0.55 + 0.45 * near, anchor="c")
-
+        cv.text(
+            tab_label(tab, lang),
+            sx + 4 + segw * (i + 0.5),
+            sy + sh / 2,
+            size=17,
+            weight="semibold",
+            alpha=0.55 + 0.45 * near,
+            anchor="c",
+        )
     wx, wy, ww, wh = x + 36, y + 100, w - 72, h - 100 - 58
     win = cv.window(wx, wy, ww, wh, fade_top=10, fade_bottom=34)
     max_scroll = 0
-
     for i, tab in enumerate(TABS):
         d = i - page_pos
         if abs(d) >= 1:
@@ -695,10 +871,8 @@ def draw_info_phase(cv: Canvas, med, lang, page_pos, tab_idx, scroll):
         _draw_ops(win, lay, wx + int(d * ww), wy - int(sc), ww, a, wy, wh)
         if i == tab_idx:
             max_scroll = max(0, int(lay.height - wh + 10))
-
     if max_scroll > 0:
         th = max(44, int(wh * wh / max(wh, lay.height)))
         ty = wy + int((scroll / max_scroll) * (wh - th)) if max_scroll else wy
         cv.main.cap_line((x + w - 16, ty + 2), (x + w - 16, ty + th - 2), w=4, a=0.38)
-
     return max_scroll

@@ -8,14 +8,14 @@ ASSETS_DIR = BASE_DIR / "assets"
 CAMERA_INDEX = 0
 FRAME_W, FRAME_H = 1280, 720
 
-# Alignment reticle on the (mirrored) display: x, y, width, height
+
 RETICLE = (80, 140, 440, 440)
 
 LANGS = [("en", "English"), ("fr", "Français"), ("ar", "العربية")]
 SECTIONS = ["dose", "warnings", "interactions"]
 
-DWELL_SECONDS = 1.2        # hold a fingertip on a button this long to "tap" it
-FUZZY_THRESHOLD = 80       # 0-100, lower = more tolerant of OCR mistakes
+DWELL_SECONDS = 1.2       
+FUZZY_THRESHOLD = 80       
 OCR_LANG = "eng+fra"
 SPEECH_RATE = 150
 GEMINI_MODEL = os.getenv("GEMINI_MODEL", "gemini-2.5-flash")

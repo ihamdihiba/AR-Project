@@ -1,1 +1,0 @@
-"""Assistive AR Medication Scanner."""

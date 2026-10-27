@@ -1,19 +1,19 @@
-# Python
+
 __pycache__/
 *.pyc
 .venv/
 venv/
 
-# Secrets - never push these
+
 .env
 
-# OS / editor
+
 .DS_Store
 Thumbs.db
 .vscode/
 .idea/
 
-# Optional local font override
+
 assets/*.ttf
 
 hand_landmarker.task
