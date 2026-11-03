@@ -15,12 +15,10 @@ from scanner.pipeline import Scanner
 from scanner.speaker import Speaker
 
 W, H = config.FRAME_W, config.FRAME_H
-# Medicine scanning area on the left
 RX, RY, RW, RH = 100, 110, 480, 480
 LANG_ORDER = ["ar", "en", "fr"]
 TABS = getattr(hud, "TABS", ["info", "dose", "warnings"])
 
-# Safe wheel constants (guarantees no AttributeError)
 SYM_WHEEL_CX = getattr(hud, "SYM_WHEEL_CX", 330)
 SYM_WHEEL_CY = getattr(hud, "SYM_WHEEL_CY", 390)
 SYM_WHEEL_STEP = getattr(hud, "SYM_WHEEL_STEP", 84)
@@ -40,7 +38,6 @@ class App:
         self.scroll_pos = 0.0
         self.max_scroll = 0
 
-        # Cylindrical Symptom Wheel Variables
         self.sym_wheel_idx = 0
         self.sym_wheel_pos = 0.0
         self.selected_symptoms = []
@@ -74,16 +71,15 @@ class App:
 
         if self.state == "SCAN":
             self.buttons.append(
-                hud.Button("scan", 920, 150, 260, 60, label="Hold to Scan", kind="glass", icon="shutter")
+                hud.Button("scan", 920, 150, 260, 60, label="Hold to Scan")
             )
-            # Top-Right Symptom Checker trigger
             self.buttons.append(
-                hud.Button("btn_symptoms", W - 280, 20, 240, 50, label="Symptom Checker", kind="chip", icon="plus")
+                hud.Button("btn_symptoms", W - 280, 20, 240, 50, label="Symptom Checker")
             )
 
         elif self.state == "SELECT_LANG":
             self.buttons.append(
-                hud.Button("reset", 36, 24, 160, 44, label="New Scan", size=17, kind="chip", icon="back")
+                hud.Button("reset", 36, 24, 160, 44, label="New Scan", size=17)
             )
             cx, cy, st = hud.WHEEL_CX, hud.WHEEL_CY, hud.WHEEL_STEP
             rw, rh = hud.WHEEL_ROW_W, hud.WHEEL_ROW_H
@@ -94,16 +90,12 @@ class App:
                 self.buttons.append(hud.Button("wheel_next", cx - rw // 2, cy + st - rh // 2, rw, rh, kind="hit"))
 
         elif self.state == "SYMPTOM_SELECT":
-            # Back Button (Top Left)
             self.buttons.append(
-                hud.Button("reset", 36, 20, 160, 44, label="Back", size=17, kind="chip", icon="back")
+                hud.Button("reset", 36, 20, 160, 44, label="Back", size=17)
             )
-            # Confirm Button AT THE TOP RIGHT
             self.buttons.append(
-                hud.Button("confirm_symptoms", W - 320, 20, 280, 52, label="Confirm Symptoms", kind="primary", icon="check")
+                hud.Button("confirm_symptoms", W - 320, 20, 280, 52, label="Confirm Symptoms")
             )
-
-            # Hit zones for the Symptom Wheel
             scx, scy, sst = SYM_WHEEL_CX, SYM_WHEEL_CY, SYM_WHEEL_STEP
             srw, srh = SYM_WHEEL_ROW_W, SYM_WHEEL_ROW_H
 
@@ -114,23 +106,23 @@ class App:
 
         elif self.state == "SHOW_RECS":
             self.buttons.append(
-                hud.Button("back_to_symptoms", 36, 20, 160, 44, label="Back", size=17, kind="chip", icon="back")
+                hud.Button("back_to_symptoms", 36, 20, 160, 44, label="Back")
             )
             for i, med in enumerate(self.recommended_meds[:3]):
                 by = 180 + i * 115
                 self.buttons.append(
-                    hud.Button(f"rec_med_{med['id']}", 240, by, 800, 95, label=med["name"], kind="glass")
+                    hud.Button(f"rec_med_{med['id']}", 240, by, 800, 95, label=med["name"])
                 )
 
         elif self.state == "SHOW_INFO":
             self.buttons.append(
-                hud.Button("reset", 36, 24, 160, 44, label="New Scan", size=17, kind="chip", icon="back")
+                hud.Button("reset", 36, 24, 160, 44, label="New Scan", size=17)
             )
             sx, sy, sw, sh = hud.seg_rect()
             for i in range(len(TABS)):
-                self.buttons.append(hud.Button(f"tab_{i}", sx + i * sw // 3, sy, sw // 3, sh, kind="tab"))
+                self.buttons.append(hud.Button(f"tab_{i}", sx + i * sw // 3, sy, sw // 3, sh))
             self.buttons.append(
-                hud.Button("listen", 1020, 130, 200, 56, label="Listen", kind="primary", icon="play")
+                hud.Button("listen", 1020, 130, 200, 56, label="Listen")
             )
 
     def notify(self, text, seconds=3.0):
@@ -202,7 +194,6 @@ class App:
                 self.scroll_target = self.scroll_pos = 0.0
             self._refresh_buttons()
 
-        # Language Wheel actions
         elif action == "wheel_prev" or (action == "swipe_down" and self.state == "SELECT_LANG"):
             self.wheel_idx = max(0, self.wheel_idx - 1)
             self._refresh_buttons()
@@ -214,7 +205,6 @@ class App:
         elif action == "wheel_pick":
             self.handle("lang_" + LANG_ORDER[self.wheel_idx])
 
-        # Symptom Cylindrical Wheel actions
         elif action == "sym_prev" or (action == "swipe_down" and self.state == "SYMPTOM_SELECT"):
             self.sym_wheel_idx = max(0, self.sym_wheel_idx - 1)
             self._refresh_buttons()
@@ -364,17 +354,26 @@ class App:
         hud.draw_cursor(frame, finger, progress, pinching=pinching)
 
     def run(self):
-        cap = cv2.VideoCapture(config.CAMERA_INDEX)
+        cap = cv2.VideoCapture(config.CAMERA_INDEX, cv2.CAP_DSHOW)
         cap.set(cv2.CAP_PROP_FRAME_WIDTH, W)
         cap.set(cv2.CAP_PROP_FRAME_HEIGHT, H)
         win = "Medication Scanner"
         cv2.namedWindow(win)
+
+        fps_prev_time = time.time()
+        fps_current = 0.0
 
         try:
             while True:
                 ok, frame = cap.read()
                 if not ok:
                     break
+
+                fps_now = time.time()
+                fps_delta = fps_now - fps_prev_time
+                fps_prev_time = fps_now
+                fps_current = 1.0 / fps_delta if fps_delta > 0 else 0.0
+
                 frame = cv2.flip(frame, 1)
                 if frame.shape[1] != W or frame.shape[0] != H:
                     frame = cv2.resize(frame, (W, H))
@@ -383,22 +382,18 @@ class App:
                 ignore_box = (RX, RY, RW, RH) if self.state == "SCAN" else None
                 finger = self.hands.update(frame, ignore_box=ignore_box)
 
-                # Pinch Drag-and-Drop for the active symptom
                 if self.state == "SYMPTOM_SELECT" and finger:
                     fx, fy = finger
                     pinching = self.hands.is_pinching
 
-                    # Grab the center-focused symptom
                     if pinching and not self.dragging_symptom:
                         scx, scy = SYM_WHEEL_CX, SYM_WHEEL_CY
                         srw, srh = SYM_WHEEL_ROW_W, SYM_WHEEL_ROW_H
-                        # If pinching near the center focus capsule
                         if (scx - srw // 2) <= fx <= (scx + srw // 2) and (scy - srh // 2 - 20) <= fy <= (scy + srh // 2 + 20):
                             active_sym = SYMPTOMS_CATALOG[self.sym_wheel_idx]
                             if active_sym not in self.selected_symptoms and len(self.selected_symptoms) < 3:
                                 self.dragging_symptom = active_sym
 
-                    # Release symptom into Right Basket (X > 620)
                     elif not pinching and self.dragging_symptom:
                         if 620 <= fx <= 1200 and 100 <= fy <= 640:
                             if len(self.selected_symptoms) < 3:
@@ -425,6 +420,18 @@ class App:
                 self.tick(min(0.1, now - self._t))
                 self._t = now
                 self.draw(frame, finger, hover, progress)
+
+                cv2.putText(
+                    frame,
+                    f"FPS: {fps_current:.1f}",
+                    (24, 44),
+                    cv2.FONT_HERSHEY_SIMPLEX,
+                    0.8,
+                    (0, 255, 0),
+                    2,
+                    cv2.LINE_AA,
+                )
+
                 cv2.imshow(win, frame)
 
                 key = cv2.waitKey(1) & 0xFF

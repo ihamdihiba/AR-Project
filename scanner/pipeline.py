@@ -6,7 +6,7 @@ import threading
 import time
 from dataclasses import dataclass, field
 
-from . import ai, drug_api, ocr_engine
+from . import ocr_engine
 
 
 @dataclass
@@ -56,19 +56,5 @@ class Scanner:
             self._busy = False
 
     @staticmethod
-    def _online(text: str):
-        rec = None
-        for name in ocr_engine.candidate_names(text):
-            rec = drug_api.lookup(name)
-            if rec:
-                break
-        if ai.available():
-            try:
-                med = ai.build_medicine(text, drug_api.fda_text(rec) if rec else None)
-                if med:
-                    return med, "ai"
-            except Exception:  # noqa: BLE001 - fall through to plain openFDA data
-                pass
-        if rec:
-            return drug_api.to_medicine(rec), "openfda"
+    def _online(self, text: str):
         return None, ""
