@@ -91,6 +91,7 @@ We measured real-time performance on a standard laptop running on CPU (no dedica
 
 - **Hiba HAMDI**
 - **Maissae ACHERNAN**
+- **Wiame BENACUER**
+- **Riham DRIOUECH**
 
 *National School of Applied Sciences of Tangier (ENSAT)*  
-*Computer Engineering Department*
