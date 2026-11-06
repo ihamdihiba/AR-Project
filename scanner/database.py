@@ -62,7 +62,6 @@ class MedicineDB:
         return out
 
     def find(self, ocr_text: str):
-        """Return (medicine dict or None, score 0-100)."""
         best_score, best_id = 0.0, None
         for chunk in self._chunks(ocr_text):
             res = process.extractOne(

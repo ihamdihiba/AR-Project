@@ -360,19 +360,11 @@ class App:
         win = "Medication Scanner"
         cv2.namedWindow(win)
 
-        fps_prev_time = time.time()
-        fps_current = 0.0
-
         try:
             while True:
                 ok, frame = cap.read()
                 if not ok:
                     break
-
-                fps_now = time.time()
-                fps_delta = fps_now - fps_prev_time
-                fps_prev_time = fps_now
-                fps_current = 1.0 / fps_delta if fps_delta > 0 else 0.0
 
                 frame = cv2.flip(frame, 1)
                 if frame.shape[1] != W or frame.shape[0] != H:
@@ -420,17 +412,6 @@ class App:
                 self.tick(min(0.1, now - self._t))
                 self._t = now
                 self.draw(frame, finger, hover, progress)
-
-                cv2.putText(
-                    frame,
-                    f"FPS: {fps_current:.1f}",
-                    (24, 44),
-                    cv2.FONT_HERSHEY_SIMPLEX,
-                    0.8,
-                    (0, 255, 0),
-                    2,
-                    cv2.LINE_AA,
-                )
 
                 cv2.imshow(win, frame)
 
