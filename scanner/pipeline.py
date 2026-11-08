@@ -55,6 +55,5 @@ class Scanner:
         finally:
             self._busy = False
 
-    @staticmethod
     def _online(self, text: str):
         return None, ""
